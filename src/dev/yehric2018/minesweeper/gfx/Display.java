@@ -20,7 +20,6 @@ public class Display {
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
 		
 		canvas = new Canvas();
 		canvas.setSize(width, height);

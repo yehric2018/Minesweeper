@@ -4,10 +4,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import dev.yehric2018.minesweeper.board.Board;
+
 public class MouseManager implements MouseListener, MouseMotionListener {
 	
 	private int mouseX, mouseY;
 	private boolean leftPressed, rightPressed;
+	private Board board;
 	
 	public MouseManager() {}
 
@@ -15,6 +18,9 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	public void setBoard(Board board) {
+		this.board = board;
 	}
 
 	@Override
@@ -57,8 +63,19 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			rightPressed = false;
 		}
+		
+		if (board != null) {
+			board.onMouseRelease(e);
+		}
 	}
 	
+	
+	public int getMouseX() {
+		return mouseX;
+	}
+	public int getMouseY() {
+		return mouseY;
+	}
 	public boolean isLeftPressed() {
 		return leftPressed;
 	}

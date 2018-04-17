@@ -3,8 +3,11 @@ package dev.yehric2018.minesweeper;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
+import dev.yehric2018.minesweeper.board.Board;
 import dev.yehric2018.minesweeper.gfx.Assets;
 import dev.yehric2018.minesweeper.gfx.Display;
+import dev.yehric2018.minesweeper.input.KeyManager;
+import dev.yehric2018.minesweeper.input.MouseManager;
 
 public class Game implements Runnable {
 	private String title;
@@ -17,15 +20,36 @@ public class Game implements Runnable {
 	private Thread thread;
 	private boolean running = false;
 	
+	private MouseManager mouseManager;
+	private KeyManager keyManager;
+	
+	private Handler handler;
+	private Board board;
+	
 	public Game(String title, int width, int height) {
 		this.title = title;
 		this.width = width;
 		this.height = height;
+		
+		this.display = new Display(title, width, height);
 	}
 	private void init() {
 		Assets.init();
 		
-		this.display = new Display(title, width, height);
+		this.handler = new Handler(this);
+		
+		this.mouseManager = new MouseManager();
+		display.getFrame().addMouseListener(mouseManager);
+		display.getFrame().addMouseMotionListener(mouseManager);
+		display.getCanvas().addMouseListener(mouseManager);
+		display.getCanvas().addMouseMotionListener(mouseManager);
+		
+		this.keyManager = new KeyManager();
+		display.getFrame().addKeyListener(keyManager);
+		
+		this.board = new Board(handler);
+		
+		display.getFrame().setVisible(true);
 	}
 	
 	public void update() {}
@@ -38,7 +62,7 @@ public class Game implements Runnable {
 		g = bs.getDrawGraphics();
 		g.clearRect(0, 0, display.getFrame().getWidth(), display.getFrame().getHeight());
 		
-		g.drawImage(Assets.tile, 0, 0, 64, 64, null);
+		board.render(g);
 		
 		bs.show();
 		g.dispose();
@@ -92,5 +116,22 @@ public class Game implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Board getBoard() {
+		return board;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	public int getHeight() {
+		return height;
+	}
+	public KeyManager getKeyManager() {
+		return keyManager;
+	}
+	public MouseManager getMouseManager() {
+		return mouseManager;
 	}
 }
