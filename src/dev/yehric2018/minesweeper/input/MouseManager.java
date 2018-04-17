@@ -52,8 +52,9 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		if (board != null) {
+			board.onMouseClick(e);
+		}
 	}
 
 	@Override

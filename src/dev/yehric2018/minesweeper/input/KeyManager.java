@@ -20,7 +20,6 @@ public class KeyManager implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println("KEYPRESSED");
 		keys[e.getKeyCode()] = true;
 	}
 

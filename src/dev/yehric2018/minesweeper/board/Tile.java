@@ -37,7 +37,7 @@ public class Tile {
 		boardX = x;
 		boardY = y;
 		this.x = x * size + 10;
-		this.y = y * size + 65;
+		this.y = y * size + 85;
 		this.bounds = new Rectangle(this.x, this.y, size, size);
 		
 		images = new BufferedImage[3];
@@ -57,22 +57,31 @@ public class Tile {
 			g.drawImage(images[0], x, y, size, size, null);
 	}
 	
+	public void onMouseClick(MouseEvent e) {
+		if (!marked && e.getButton() == MouseEvent.BUTTON1 && bounds.contains(e.getX(), e.getY()))
+			handler.getBoard().getResetButton().setFace(1);
+	}
 	public void onMouseRelease(MouseEvent e) {
 		if (!marked && e.getButton() == MouseEvent.BUTTON1 && bounds.contains(e.getX(), e.getY())) {
 			revealed = true;
 			if (mine) {
 				images[2] = Assets.hitMine;
-				handler.getBoard().endGame();
-			} if (danger == 0) {
+				handler.getBoard().loseGame();
+			} else if (danger == 0) {
 				revealed = false;
 				handler.getBoard().recursion(boardY, boardX);
+				handler.getBoard().getResetButton().setFace(0);
+			} else {
+				handler.getBoard().getResetButton().setFace(0);
 			}
-		}
-		else if (!revealed && e.getButton() == MouseEvent.BUTTON3 && bounds.contains(e.getX(), e.getY())) {
-			if (marked)
+		} else if (!revealed && e.getButton() == MouseEvent.BUTTON3 && bounds.contains(e.getX(), e.getY())) {
+			if (marked) {
 				marked = false;
-			else
+				handler.getBoard().removeMark();
+			} else {
 				marked = true;
+				handler.getBoard().useMark();
+			}
 		}
 	}
 	public boolean isMine() {
@@ -94,6 +103,10 @@ public class Tile {
 	
 	public boolean isRevealed() {
 		return revealed;
+	}
+	
+	public void setFlag() {
+		marked = true;
 	}
 	public void reveal() {
 		revealed = true;

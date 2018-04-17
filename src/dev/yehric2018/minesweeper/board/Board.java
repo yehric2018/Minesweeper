@@ -2,6 +2,7 @@ package dev.yehric2018.minesweeper.board;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 import dev.yehric2018.minesweeper.Handler;
 import dev.yehric2018.minesweeper.gfx.Assets;
@@ -14,11 +15,21 @@ public class Board {
 	
 	private boolean alive;
 	
+	private int timer;
+	private boolean timerStart;
+	
+	private int marksLeft;
+	private int safeTiles;
+	
+	private ResetButton resetButton;
+	
 	public Board(Handler handler) {
 		this.handler = handler;
 		width = Handler.GAMEWIDTH;
 		height = Handler.GAMEHEIGHT;
 		this.handler.getMouseManager().setBoard(this);
+		timer = 0;
+		timerStart = false;
 		
 		alive = true;
 		handler.setBoard(this);
@@ -32,7 +43,11 @@ public class Board {
 				grid[i][j] = new Tile(handler, i, j);
 			}
 		}
-		int mines = width * height / 10;
+		
+		marksLeft = 99;
+		safeTiles = width * height - marksLeft;
+		
+		int mines = marksLeft;
 		while (mines > 0) {
 			for (int i = 0; i < height; i++) {
 				for (int j = 0; j < width; j++) {
@@ -40,7 +55,11 @@ public class Board {
 						grid[i][j].setMine();
 						mines--;
 					}
+					if (mines == 0)
+						break;
 				}
+				if (mines == 0)
+					break;
 			}
 		}
 		for (int i = 0; i < height; i++) {
@@ -50,6 +69,7 @@ public class Board {
 				}
 			}
 		}
+		resetButton = new ResetButton(handler, handler.getWidth() / 2 - 25, 10, 50);
 	}
 	private int findMines(int y, int x) {
 		int count = 0;
@@ -72,15 +92,38 @@ public class Board {
 		return count;
 	}
 	
-	public void update() {}
 	public void render(Graphics g) {
+		resetButton.render(g);
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				grid[i][j].render(g);
 			}
 		}
+		
+		//MINES LEFT RENDER
+		g.drawImage(Assets.score[marksLeft % 1000 / 100], 200, 15, 26, 46, null);
+		g.drawImage(Assets.score[marksLeft % 100 / 10], 226, 15, 26, 46, null);
+		g.drawImage(Assets.score[marksLeft % 10], 252, 15, 26, 46, null);
+		
+		//GAME TIMER RENDER
+		if (timerStart) {
+			timer++;
+		}
+		int gameTime = timer / 60;
+		g.drawImage(Assets.score[gameTime % 1000 / 100], 800, 15, 26, 46, null);
+		g.drawImage(Assets.score[gameTime % 100 / 10], 826, 15, 26, 46, null);
+		g.drawImage(Assets.score[gameTime % 10], 852, 15, 26, 46, null);
 	}
 	
+	public void onMouseClick(MouseEvent e) {
+		if (alive) {
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+					grid[i][j].onMouseClick(e);
+				}
+			}
+		}
+	}
 	public void onMouseRelease(MouseEvent e) {
 		if (alive) {
 			for (int i = 0; i < height; i++) {
@@ -88,6 +131,21 @@ public class Board {
 					grid[i][j].onMouseRelease(e);
 				}
 			}
+		}
+		resetButton.onMouseRelease(e);
+		
+		int count = 0;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (grid[i][j].isRevealed()) {
+					count++;
+				}
+			}
+		}
+		if (count > 0 && !timerStart && alive)
+			timerStart = true;
+		if (count == safeTiles) {
+			winGame();
 		}
 	}
 	
@@ -114,13 +172,38 @@ public class Board {
 				recursion(y, x + 1);
 		}
 	}
-	public void endGame() {
+	
+	public void loseGame() {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				if (grid[i][j].isMine())
 					grid[i][j].reveal();
 			}
 		}
+		timerStart = false;
 		alive = false;
+		resetButton.setFace(3);
+	}
+	private void winGame() {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (grid[i][j].isMine())
+					grid[i][j].setFlag();
+			}
+		}
+		marksLeft = 0;
+		timerStart = false;
+		alive = false;
+		resetButton.setFace(2);
+	}
+	
+	public ResetButton getResetButton() {
+		return resetButton;
+	}
+	public void removeMark() {
+		marksLeft++;
+	}
+	public void useMark() {
+		marksLeft--;
 	}
 }

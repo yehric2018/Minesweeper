@@ -1,12 +1,14 @@
 package dev.yehric2018.minesweeper;
 
+import javax.swing.JFrame;
+
 import dev.yehric2018.minesweeper.board.Board;
 import dev.yehric2018.minesweeper.input.KeyManager;
 import dev.yehric2018.minesweeper.input.MouseManager;
 
 public class Handler {
 	
-	public static final int GAMEWIDTH = 40, GAMEHEIGHT = 20;
+	public static final int GAMEWIDTH = 30, GAMEHEIGHT = 24;
 	
 	private Game game;
 	private Board board;
@@ -23,6 +25,17 @@ public class Handler {
 	}
 	public void setBoard(Board board) {
 		this.board = board;
+	}
+	
+	public JFrame getFrame() {
+		return game.getDisplay().getFrame();
+	}
+	
+	public int getWidth() {
+		return game.getWidth();
+	}
+	public int getHeight() {
+		return game.getHeight();
 	}
 	
 	public KeyManager getKeyManager() {

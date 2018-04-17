@@ -10,7 +10,6 @@ import dev.yehric2018.minesweeper.input.KeyManager;
 import dev.yehric2018.minesweeper.input.MouseManager;
 
 public class Game implements Runnable {
-	private String title;
 	private int width, height;
 	
 	private Display display;
@@ -27,7 +26,6 @@ public class Game implements Runnable {
 	private Board board;
 	
 	public Game(String title, int width, int height) {
-		this.title = title;
 		this.width = width;
 		this.height = height;
 		
@@ -35,6 +33,7 @@ public class Game implements Runnable {
 	}
 	private void init() {
 		Assets.init();
+		display.getFrame().setIconImage(Assets.icon);
 		
 		this.handler = new Handler(this);
 		
@@ -52,7 +51,10 @@ public class Game implements Runnable {
 		display.getFrame().setVisible(true);
 	}
 	
-	public void update() {}
+	public void resetGame() {
+		this.board = new Board(handler);
+	}
+
 	public void render() {
 		bs = display.getCanvas().getBufferStrategy();
 		if (bs == null) {
@@ -86,13 +88,11 @@ public class Game implements Runnable {
 			lastTime = now;
 			
 			if (delta >= 1) {
-				update();
 				render();
 				ticks++;
 				delta--;
 			}
 			if (timer  >= 1000000000) {
-				System.out.println("Ticks and Frames: " + ticks);
 				ticks = 0;
 				timer = 0;
 			}
@@ -133,5 +133,8 @@ public class Game implements Runnable {
 	}
 	public MouseManager getMouseManager() {
 		return mouseManager;
+	}
+	public Display getDisplay() {
+		return display;
 	}
 }
