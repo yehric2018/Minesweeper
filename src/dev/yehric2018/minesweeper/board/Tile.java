@@ -10,7 +10,7 @@ import dev.yehric2018.minesweeper.gfx.Assets;
 
 public class Tile {
 	
-	public static final int TILESIZE = 35;
+	public static final int TILESIZE = 25;
 	private Handler handler;
 	private Rectangle bounds;
 	
@@ -36,7 +36,7 @@ public class Tile {
 		this.size = TILESIZE;
 		boardX = x;
 		boardY = y;
-		this.x = x * size + 10;
+		this.x = x * size + 5;
 		this.y = y * size + 85;
 		this.bounds = new Rectangle(this.x, this.y, size, size);
 		
@@ -44,10 +44,7 @@ public class Tile {
 		images[0] = Assets.tile;
 		images[1] = Assets.flag;
 	}
-	
-	public void update() {
-		
-	}
+
 	public void render(Graphics g) {
 		if (revealed)
 			g.drawImage(images[2], x, y, size, size, null);

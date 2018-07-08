@@ -2,7 +2,6 @@ package dev.yehric2018.minesweeper.board;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 import dev.yehric2018.minesweeper.Handler;
 import dev.yehric2018.minesweeper.gfx.Assets;
@@ -17,6 +16,7 @@ public class Board {
 	
 	private int timer;
 	private boolean timerStart;
+	private long initialTime;
 	
 	private int marksLeft;
 	private int safeTiles;
@@ -107,12 +107,15 @@ public class Board {
 		
 		//GAME TIMER RENDER
 		if (timerStart) {
-			timer++;
+			long now = System.nanoTime();
+			if (now - initialTime >= 1000000000) {
+				timer++;
+				initialTime = now;
+			}
 		}
-		int gameTime = timer / 60;
-		g.drawImage(Assets.score[gameTime % 1000 / 100], 800, 15, 26, 46, null);
-		g.drawImage(Assets.score[gameTime % 100 / 10], 826, 15, 26, 46, null);
-		g.drawImage(Assets.score[gameTime % 10], 852, 15, 26, 46, null);
+		g.drawImage(Assets.score[timer % 1000 / 100], 500, 15, 26, 46, null);
+		g.drawImage(Assets.score[timer % 100 / 10], 526, 15, 26, 46, null);
+		g.drawImage(Assets.score[timer % 10], 552, 15, 26, 46, null);
 	}
 	
 	public void onMouseClick(MouseEvent e) {
@@ -142,8 +145,10 @@ public class Board {
 				}
 			}
 		}
-		if (count > 0 && !timerStart && alive)
+		if (count > 0 && !timerStart && alive) {
 			timerStart = true;
+			initialTime = System.nanoTime();
+		}
 		if (count == safeTiles) {
 			winGame();
 		}

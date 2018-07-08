@@ -6,21 +6,16 @@ import java.awt.image.BufferStrategy;
 import dev.yehric2018.minesweeper.board.Board;
 import dev.yehric2018.minesweeper.gfx.Assets;
 import dev.yehric2018.minesweeper.gfx.Display;
-import dev.yehric2018.minesweeper.input.KeyManager;
 import dev.yehric2018.minesweeper.input.MouseManager;
 
-public class Game implements Runnable {
+public class Game {
 	private int width, height;
 	
 	private Display display;
 	private BufferStrategy bs;
 	private Graphics g;
 	
-	private Thread thread;
-	private boolean running = false;
-	
 	private MouseManager mouseManager;
-	private KeyManager keyManager;
 	
 	private Handler handler;
 	private Board board;
@@ -42,9 +37,6 @@ public class Game implements Runnable {
 		display.getFrame().addMouseMotionListener(mouseManager);
 		display.getCanvas().addMouseListener(mouseManager);
 		display.getCanvas().addMouseMotionListener(mouseManager);
-		
-		this.keyManager = new KeyManager();
-		display.getFrame().addKeyListener(keyManager);
 		
 		this.board = new Board(handler);
 		
@@ -70,51 +62,11 @@ public class Game implements Runnable {
 		g.dispose();
 	}
 
-	@Override
 	public void run() {
 		init();
 		
-		int fps = 60;
-		double timePerTick = 1000000000 / fps;
-		double delta = 0;
-		long now;
-		long lastTime = System.nanoTime();
-		long timer = 0;
-		int ticks = 0;
-		while (running) {
-			now = System.nanoTime();
-			delta += (now - lastTime) / timePerTick;
-			timer += now - lastTime;
-			lastTime = now;
-			
-			if (delta >= 1) {
-				render();
-				ticks++;
-				delta--;
-			}
-			if (timer  >= 1000000000) {
-				ticks = 0;
-				timer = 0;
-			}
-		}
-		stop();
-	}
-	
-	public synchronized void start() {
-		if (running)
-			return;
-		running = true;
-		thread = new Thread(this);
-		thread.start();
-	}
-	public synchronized void stop() {
-		if (!running)
-			return;
-		running = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while (true) {
+			render();
 		}
 	}
 	
@@ -127,9 +79,6 @@ public class Game implements Runnable {
 	}
 	public int getHeight() {
 		return height;
-	}
-	public KeyManager getKeyManager() {
-		return keyManager;
 	}
 	public MouseManager getMouseManager() {
 		return mouseManager;
